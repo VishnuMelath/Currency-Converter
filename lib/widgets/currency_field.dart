@@ -15,7 +15,8 @@ class CurrencyField extends StatelessWidget {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        border: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black12)),
       ),
       items: currencies.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
@@ -24,7 +25,7 @@ class CurrencyField extends StatelessWidget {
         );
       }).toList(),
       onChanged: (value) {
-        if (value != null) {
+        if (value != null || value!.trim() != '') {
           controller.text = value;
         }
       },

@@ -17,8 +17,6 @@ class RowLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController(text: '0');
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(

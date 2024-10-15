@@ -10,7 +10,8 @@ class AmountField extends StatelessWidget {
       controller: controller,
       decoration: const InputDecoration(
         labelText: 'Amount',
-        border: OutlineInputBorder(),
+        border:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
       ),
       keyboardType: TextInputType.number,
     );

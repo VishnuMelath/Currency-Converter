@@ -14,11 +14,10 @@ class ConvertionApi {
         final currencies = data.keys.toList();
         return List<String>.from(currencies);
       } else {
-        throw Exception('Failed to load currencies');
+        throw Exception('Failed to load currencies! Try restarting the app');
       }
     } catch (e) {
-      print('Error: $e');
-      throw Exception('Error fetching currencies');
+      throw Exception('Error fetching currencies! Try restarting the app');
     }
   }
 

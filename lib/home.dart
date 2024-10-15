@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 import 'repository/convertion_api.dart';
@@ -16,8 +14,7 @@ class CurrencyConverterScreen extends StatefulWidget {
 }
 
 class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
-  final TextEditingController _amountController =
-      TextEditingController(text: '0');
+  late TextEditingController _amountController;
   final TextEditingController _fromController = TextEditingController(text: '');
   final TextEditingController _toController = TextEditingController(text: '');
   late Size size;
@@ -25,8 +22,10 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   late List<String> _currencies;
   bool loading = true;
   bool resultVisible = false;
+  bool convertLoading = false;
   @override
   void initState() {
+    _amountController = TextEditingController(text: '0');
     _loadCountries(context);
     super.initState();
   }
@@ -84,9 +83,11 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  ConvertButton(
-                    callback: _convert,
-                  ),
+                  convertLoading
+                      ? const CircularProgressIndicator()
+                      : ConvertButton(
+                          callback: _convert,
+                        ),
                 ],
               ),
             ),
@@ -94,15 +95,22 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
   }
 
   Future<void> _loadCountries(BuildContext context) async {
-    loading = true;
-    _currencies = (await ConvertionApi().getCurrencies()).toSet().toList();
-    loading = false;
-    print(_currencies);
-    setState(() {});
+    try {
+      loading = true;
+      _currencies = (await ConvertionApi().getCurrencies()).toSet().toList();
+      loading = false;
+      setState(() {});
+    } on Exception catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   Future<void> _convert() async {
     try {
+      setState(() {
+        convertLoading = true;
+      });
       if (_fromController.text == '' || _toController.text == '') {
         resultString = 'Please select Currency';
       } else if (double.tryParse(_amountController.text) == null) {
@@ -113,10 +121,17 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
             _toController.text,
             double.parse(_amountController.text));
         resultString =
-            '${_amountController.text} ${_fromController.text.toUpperCase()} =${convertedRate.toStringAsFixed(2)} ${_toController.text.toUpperCase()}';
+            '${_amountController.text} ${_fromController.text.toUpperCase()} = ${convertedRate.toStringAsFixed(2)} ${_toController.text.toUpperCase()}';
       }
       resultVisible = true;
-      setState(() {});
-    } catch (e) {}
+      setState(() {
+        convertLoading = false;
+      });
+    } catch (e) {
+      resultString = e.toString();
+      setState(() {
+        convertLoading = false;
+      });
+    }
   }
 }
